@@ -1,0 +1,64 @@
+{% extends "base.html" %}
+{% block body %}
+{% include "navbar.html" %}
+</style>
+
+<div class="container padding">
+  <div class="row">
+    <div class="col">      
+        <form  action="/showitem/{{item.id}}" method="post" id="formfield">
+          <div class="form-group">
+            <label for="itemname">item</label>
+            <input type="item" class="form-control itemname"  aria-describedby="itemHelp"  name="item_text" value={{item.item_name}} readonly>        
+          </div>
+          <div class="form-group">
+            <label for="descriptioncontent">Description</label>
+            <textarea class="form-control descriptioncontent" rows="5"  name="description_text" readonly>{{item.description}}</textarea>
+          </div>                  
+          <div class="form-group">
+              <label for="itemname">Category</label>
+              <input type="item" class="form-control"  aria-describedby="itemHelp" value={{item.catalog_name}} readonly>        
+          </div>         
+          <div class="btn-group" role="group" aria-label="Basic example">
+              <button type="button" class="btn btn-secondary edit">Edit</button>              
+          </div>          
+            <button type="submit" class="btn btn-primary" name="action" value="save">Save</button>            
+            <button type="button" class="btn btn-warning" data-toggle="modal" data-target="#myModal">Delete</button>          
+        </form>        
+    </div>    
+  </div>
+   <div class="container">        
+        
+      
+        <!-- The Modal -->
+        <div class="modal" id="myModal">
+          <div class="modal-dialog">
+            <div class="modal-content">
+            
+              <!-- Modal Header -->
+              <div class="modal-header">
+                <h4 class="modal-title">Delete</h4>
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+              </div>
+              
+              <!-- Modal body -->
+              <div class="modal-body">
+                Are you sure you want to delete the item?
+              </div>
+              
+              <!-- Modal footer -->
+              <div class="modal-footer">
+                <button type="button" class="btn btn-primary" data-dismiss="modal">Cancel</button>
+                <a href="#" id="delete_btn" name="action" class="btn btn-danger">Delete</a>
+              </div>
+              
+            </div>
+          </div>
+        </div>
+        
+      </div>
+  
+{% endblock %}
+{% block scripts %}
+<script src="../static/js/scripts.js"></script>
+{% endblock %}

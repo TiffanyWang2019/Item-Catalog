@@ -1,0 +1,44 @@
+{% extends "base.html" %}
+{% block body %}
+{% include "navbar.html" %}
+</style>
+
+<div class="container padding">
+  <div class="row">
+    <div class="col">      
+      <h1 style="color:#004080;font-family:verdana;">Add Items</h1>
+      <form action="/additem" method="post">
+        <div class="form-group">
+          <label for="itemname">item</label>
+          <input type="item" class="form-control" id="itemname" aria-describedby="itemHelp" placeholder="Enter Item Name" name="item_text">        
+        </div>
+        <div class="form-group">
+          <label for="descriptioncontent">Description</label>
+          <textarea class="form-control" rows="5" id="descriptioncontent" name="description_text"></textarea>
+        </div>                  
+        <div class="form-group">
+          <div class="dropdown">
+            <button type="button" class="btn btn-primary dropdown-toggle" data-toggle="dropdown">
+              Categories
+            </button>
+            <input type="hidden" name="categoryId" class="categoryindex">
+            <div class="dropdown-menu" name="item">
+              {%  for item in catalog %}
+              <li>
+                <a class="dropdown-item" href="#" data-value={{item.id}}>{{item.catalog_name}}</a>                
+              </li>              
+              {% endfor %}             
+            </div>
+          </div>
+        </div>          
+        <button type="submit" class="btn btn-primary">Submit</button>
+      </form> 
+    </div>        
+  </div>
+ </div>
+
+  
+{% endblock %}
+{% block scripts %}
+<script src="../static/js/scripts.js"></script>
+{% endblock %}

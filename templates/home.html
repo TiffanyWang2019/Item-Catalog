@@ -1,0 +1,57 @@
+{% extends "base.html" %}
+{% block body %}
+{% include "navbar.html" %}
+</style>
+
+<div class="container padding">
+  <div class="row">
+    <div class="col">      
+      <h1 style="color:#004080;font-family:verdana;">Categories</h1>     
+      <div class="form-group">
+          <a href="/addcategory" class="btn btn-primary active">
+            <i class="glyphicon glyphicon-floppy-disk" aria-hidden="true"></i> Add Category
+          </a>
+      </div>  
+        <div class="list-group catalog" id="category_item">
+          {%  for item in catalog %}
+            <a href="#" class="list-group-item" category_id={{item.id}}>
+               {{item.catalog_name}}
+            </a>
+          {% endfor %}             
+          </div>
+    </div>    
+    <div class="col">
+        <h1 style="color:#004080;font-family:verdana;" id="categoryname">Latest Items</h1>
+        <div class="form-group">
+            <a href="/additem" class="btn btn-primary active">
+              <i class="glyphicon glyphicon-floppy-disk" aria-hidden="true"></i> Add Item
+            </a>
+        </div>        
+        <div class="list-group item-group" id="item_name">
+            {%  for item in item_details %}
+            <a href="/showitem/{{item.id}}" class="list-group-item" item_id={{item.catalog_name}}>
+                {{item.item_name}}({{item.catalog_name}})
+            </a>
+          {% endfor %} 
+          </div>
+    </div>        
+  </div>
+
+  <div class="container padding">
+      <div class="row">
+        <div class="col">      
+          <h1 style="color:#004080;font-family:verdana;">Restful API</h1>     
+            <div class="list-group catalog" id="category_item">
+                <a href="/showall/api/v1.0/all.json" class="list-group-item">
+                    Restful API Show All Item
+                 </a>
+              </div>
+        </div>            
+  </div>
+     
+
+  
+{% endblock %}
+{% block scripts %}
+<script src="../static/js/scripts.js"></script>
+{% endblock %}
