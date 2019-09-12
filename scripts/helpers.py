@@ -15,7 +15,7 @@ def session_scope():
     try:
         yield s
         s.commit()
-    except BaseException:
+    except:
         s.rollback()
         raise
     finally:
@@ -70,6 +70,14 @@ def username_taken(username):
     with session_scope() as s:
         return s.query(tabledef.User).filter(tabledef.User.username.in_([username])).first()  # noqa
 
+def is_registered(email):
+    with session_scope() as s:
+        return s.query(tabledef.User).filter(tabledef.User.email == email).count()
+
+def get_user_by_email(email):
+    with session_scope() as s:
+        return s.query(tabledef.User).filter(tabledef.User.email == email).one()
+
 
 def query_catalog():
     with session_scope() as s:
@@ -83,18 +91,22 @@ def add_catalog(catalog):
         s.commit()
 
 
-def add_item(item_name, description, catalog_id):
+def add_item(item_name, description, catalog_id, user_id):
     with session_scope() as s:
         u = tabledef.Item(item_name=item_name,
                           description=description,
-                          catalog_id=catalog_id)
+                          catalog_id=catalog_id,
+                          user_id = user_id)
         s.add(u)
         s.commit()
 
 
 def query_catalog_and_item():
     with session_scope() as s:
-        return s.query(tabledef.Item, tabledef.Catalog).filter(tabledef.Catalog.id == tabledef.Item.catalog_id).add_columns(tabledef.Item.id, tabledef.Catalog.catalog_name, tabledef.Item.item_name).all()  # noqa
+        return s.query(tabledef.Item, tabledef.Catalog,tabledef.User).\
+        filter(tabledef.Catalog.id == tabledef.Item.catalog_id).\
+        filter(tabledef.User.id == tabledef.Item.user_id).\
+        add_columns(tabledef.Item.id, tabledef.Catalog.catalog_name, tabledef.Item.item_name).all()  # noqa
 
 
 def query_item(id):
@@ -105,7 +117,8 @@ def query_item(id):
             add_columns(tabledef.Item.id,
                         tabledef.Catalog.catalog_name,
                         tabledef.Item.item_name,
-                        tabledef.Item.description).all()
+                        tabledef.Item.description,
+                        tabledef.Item.user_id).all()
 
 
 def update_item(id, item_title, item_description):

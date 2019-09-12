@@ -1,0 +1,20 @@
+{% extends "base.html" %}
+{% block body %}
+{% include "navbar.html" %}
+</style>
+
+<div class="container padding">
+  <div class="row">
+    <div class="alert alert-primary" role="alert">
+      You do not have permission to {{msg}} the item <a href="/showcatalogs" class="alert-link">Go Back</a>. 
+    </div>
+    </div>        
+  </div>
+
+  
+
+  
+{% endblock %}
+{% block scripts %}
+<script src="../static/js/scripts.js"></script>
+{% endblock %}
