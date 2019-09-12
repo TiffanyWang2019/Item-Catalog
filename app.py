@@ -3,7 +3,7 @@
 from scripts import tabledef
 from scripts import forms
 from scripts import helpers
-from flask import g, Flask, redirect, url_for, render_template, request
+from flask import Flask, redirect, url_for, render_template, request
 from flask import session, jsonify
 from flask_oauthlib.client import OAuth
 from functools import wraps
