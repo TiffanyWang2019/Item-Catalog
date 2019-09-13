@@ -3,7 +3,7 @@
 from scripts import tabledef
 from scripts import forms
 from scripts import helpers
-from flask import Flask, redirect, url_for, render_template, request
+from flask import g, Flask, redirect, url_for, render_template, request
 from flask import session, jsonify
 from flask_oauthlib.client import OAuth
 from functools import wraps
@@ -11,6 +11,7 @@ import json
 import os
 import google.oauth2.credentials
 import googleapiclient.discovery
+from flask_migrate import Migrate
 
 
 app = Flask(__name__)
@@ -19,6 +20,7 @@ app.config['GOOGLE_SECRET'] = "-bTgr4zCGgDEk7gaGd1yZmBF"
 app.debug = True
 app.secret_key = 'development'
 oauth = OAuth(app)
+
 
 google = oauth.remote_app(
     'google',
@@ -64,6 +66,9 @@ def login():
             return json.dumps({'status': 'Both fields required'})
         return render_template('login.html', form=form)
     user = helpers.get_user()
+    session['logged_in'] = True
+    session['username'] = user.username
+    session['userid'] = user.id
     return redirect(url_for('showcatalogs'))
 
 
@@ -82,7 +87,16 @@ def authorized():
         )
     session['google_token'] = (resp['access_token'], '')
     me = google.get('userinfo')
+    data = me.data
+    email = data['email']
     session['logged_in'] = True
+    session['username'] = email
+    if helpers.is_registered(email) == 0:
+        password = helpers.hash_password(email)
+        helpers.add_user(email, password, email)
+    user = helpers.get_user_by_email(email)
+    id = user.id
+    session['userid'] = id
     return redirect(url_for('showcatalogs'))
 
 
@@ -94,6 +108,8 @@ def get_google_oauth_token():
 @app.route('/showcatalogs', methods=['GET', 'POST'])
 @login_required
 def showcatalogs():
+    # if the request is not ajax
+    # then render page
     if not request.is_xhr:
         catalog = helpers.query_catalog()
         item_details = helpers.query_catalog_and_item()
@@ -113,6 +129,18 @@ def showcatalogs():
 @login_required
 def get_tasks():
     item_details = helpers.query_catalog_and_item()
+    ret = []
+    for item in item_details:
+        ret.append({"item": item.item_name, "category": item.catalog_name})
+    return jsonify({'Category': ret})
+
+
+@app.route('/queryitem/api/v1.0/item/<item_id>', methods=['GET'])
+@login_required
+def get_item(item_id):
+    item_details = helpers.query_item(item_id)
+    if (len(item_details) == 0):
+        return jsonify({'Category': "empty"})
     ret = []
     for item in item_details:
         ret.append({"item": item.item_name, "category": item.catalog_name})
@@ -140,7 +168,8 @@ def additem():
         item_text = request.form['item_text'].lower()
         description_text = request.form['description_text'].lower()
         id = request.form['categoryId']
-        helpers.add_item(item_text, description_text, id)
+        user_id = session['userid']
+        helpers.add_item(item_text, description_text, id, user_id)
         return redirect(url_for('showcatalogs'))
 
 
@@ -148,19 +177,29 @@ def additem():
 @login_required
 def showedititem(item_id):
     if request.method == 'GET':
-        item_id = item_id
         item = helpers.query_item(item_id)
         return render_template('showitem.html', item=item[0])
     elif request.method == 'POST' and 'action' in request.form and request.form['action'] == 'save':  # noqa
-        item_id = item_id
+        # save action
         item_text_value = request.form['item_text']
         description_text = request.form['description_text']
-        helpers.update_item(item_id, item_text_value, description_text)
-        return redirect(url_for('showcatalogs'))
+        user_id = session['userid']
+        item = helpers.query_item(item_id)[0]
+        if (item.user_id == user_id):
+            helpers.update_item(item_id, item_text_value, description_text)
+            return redirect(url_for('showcatalogs'))
+        else:
+            # no permission to do update
+            return render_template('message.html', msg="update")
     elif request.method == 'POST' and 'action' in request.form and request.form['action'] == 'delete':  # noqa
-        item_id = item_id
-        helpers.delete_item(item_id)
-        return redirect(url_for('showcatalogs'))
+        # delete action
+        user_id = session['userid']
+        item = helpers.query_item(item_id)[0]
+        if (item.user_id == user_id):
+            helpers.delete_item(item_id)
+            return redirect(url_for('showcatalogs'))
+        else:
+            return render_template('message.html', msg="delete")
     else:
         return redirect(url_for('showcatalogs'))
 
@@ -169,6 +208,7 @@ def showedititem(item_id):
 def logout():
     session['logged_in'] = False
     session.pop('google_token', None)
+    session.clear()
     return redirect(url_for('login'))
 
 
@@ -212,4 +252,5 @@ def settings():
 # ======== Main ============ #
 if __name__ == "__main__":
     app.secret_key = os.urandom(12)  # Generic key for dev purposes only
+    # app.run(debug=True, use_reloader=True)
     app.run(host='localhost', port=8000, debug=True, use_reloader=True)
