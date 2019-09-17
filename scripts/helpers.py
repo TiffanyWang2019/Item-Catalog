@@ -71,6 +71,16 @@ def username_taken(username):
         return s.query(tabledef.User).filter(tabledef.User.username.in_([username])).first()  # noqa
 
 
+def is_registered(email):
+    with session_scope() as s:
+        return s.query(tabledef.User).filter(tabledef.User.email == email).count()  # noqa
+
+
+def get_user_by_email(email):
+    with session_scope() as s:
+        return s.query(tabledef.User).filter(tabledef.User.email == email).one()  # noqa
+    
+    
 def query_catalog():
     with session_scope() as s:
         return s.query(tabledef.Catalog).all()
