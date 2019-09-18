@@ -93,18 +93,22 @@ def add_catalog(catalog):
         s.commit()
 
 
-def add_item(item_name, description, catalog_id):
+def add_item(item_name, description, catalog_id, user_id):
     with session_scope() as s:
         u = tabledef.Item(item_name=item_name,
                           description=description,
-                          catalog_id=catalog_id)
+                          catalog_id=catalog_id,
+                          user_id=user_id)
         s.add(u)
         s.commit()
 
 
 def query_catalog_and_item():
     with session_scope() as s:
-        return s.query(tabledef.Item, tabledef.Catalog).filter(tabledef.Catalog.id == tabledef.Item.catalog_id).add_columns(tabledef.Item.id, tabledef.Catalog.catalog_name, tabledef.Item.item_name).all()  # noqa
+        return s.query(tabledef.Item, tabledef.Catalog, tabledef.User).\
+        filter(tabledef.Catalog.id == tabledef.Item.catalog_id).\
+        filter(tabledef.User.id == tabledef.Item.user_id).\
+        add_columns(tabledef.Item.id, tabledef.Catalog.catalog_name, tabledef.Item.item_name).all()  # noqa
 
 
 def query_item(id):
@@ -115,15 +119,16 @@ def query_item(id):
             add_columns(tabledef.Item.id,
                         tabledef.Catalog.catalog_name,
                         tabledef.Item.item_name,
-                        tabledef.Item.description).all()
+                        tabledef.Item.description,
+                        tabledef.Item.user_id).all()
 
 
 def update_item(id, item_title, item_description):
     with session_scope() as s:
         s.query(tabledef.Item).\
-                filter(tabledef.Item.id == id).\
-                update({"item_name": item_title,
-                        "description": item_description})
+            filter(tabledef.Item.id == id).\
+            update({"item_name": item_title,
+                    "description": item_description})
         s.commit()
 
 
@@ -138,8 +143,8 @@ def delete_item(id):
 def query_bycatalogid_and_item(id):
     with session_scope() as s:
         return s.query(tabledef.Item, tabledef.Catalog).\
-               filter(tabledef.Catalog.id == tabledef.Item.catalog_id).\
-               filter(tabledef.Catalog.id == id).\
-               add_columns(tabledef.Item.id,
-                           tabledef.Catalog.catalog_name,
-                           tabledef.Item.item_name).all()
+            filter(tabledef.Catalog.id == tabledef.Item.catalog_id).\
+            filter(tabledef.Catalog.id == id).\
+            add_columns(tabledef.Item.id,
+                        tabledef.Catalog.catalog_name,
+                        tabledef.Item.item_name).all()
