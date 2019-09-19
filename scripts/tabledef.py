@@ -27,9 +27,9 @@ def db_connect():
 class User(Base):
     __tablename__ = "user"
     id = Column(Integer, primary_key=True)
-    username = Column(String(30), unique=True)
+    username = Column(String(200), unique=True)
     password = Column(String(512))
-    email = Column(String(50))
+    email = Column(String(200), unique=True)
 
     def __repr__(self):
         return '<User %r>' % self.username
@@ -50,6 +50,7 @@ class Item(Base):
     item_name = Column(String(50), unique=True)
     description = Column('content', String(100000))
     catalog_id = Column(Integer, ForeignKey('catalog.id'))
+    user_id = Column(Integer, ForeignKey('user.id'))
 
     # created_date = Column(DateTime(timezone=True), server_default=func.now())
     def __repr__(self):
@@ -58,3 +59,5 @@ class Item(Base):
 
 engine = db_connect()  # Connect to database
 Base.metadata.create_all(engine)  # Create models
+if __name__ == '__main__':
+    manager.run()
