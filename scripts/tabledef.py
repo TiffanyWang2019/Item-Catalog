@@ -29,7 +29,8 @@ class User(Base):
     id = Column(Integer, primary_key=True)
     username = Column(String(200), unique=True)
     password = Column(String(512))
-    email = Column(String(200),unique=True)
+    email = Column(String(200), unique=True)
+
     def __repr__(self):
         return '<User %r>' % self.username
 
@@ -54,6 +55,7 @@ class Item(Base):
     # created_date = Column(DateTime(timezone=True), server_default=func.now())
     def __repr__(self):
         return '<Catalog %r>' % self.item_name
+
 
 engine = db_connect()  # Connect to database
 Base.metadata.create_all(engine)  # Create models

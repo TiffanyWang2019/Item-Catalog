@@ -15,7 +15,7 @@ from flask_migrate import Migrate
 
 
 app = Flask(__name__)
-app.config['GOOGLE_ID'] = "17614516131-qf2o1gn2cop4l200agt15ke45r9hqqgf.apps.googleusercontent.com"
+app.config['GOOGLE_ID'] = "17614516131-qf2o1gn2cop4l200agt15ke45r9hqqgf.apps.googleusercontent.com"  # noqa
 app.config['GOOGLE_SECRET'] = "-bTgr4zCGgDEk7gaGd1yZmBF"
 app.debug = True
 app.secret_key = 'development'
@@ -36,15 +36,17 @@ google = oauth.remote_app(
     authorize_url='https://accounts.google.com/o/oauth2/auth',
 )
 
+
 def login_required(f):
     @wraps(f)
     def wrap(*args, **kwargs):
-        if 'logged_in' in session and session['logged_in'] == True:
+        if 'logged_in' in session and session['logged_in'] is True:
             return f(*args, **kwargs)
-        else:            
+        else:
             return redirect(url_for('login'))
 
     return wrap
+
 
 # ======== Routing ========== #
 # -------- Login ------------ #
@@ -66,8 +68,9 @@ def login():
     user = helpers.get_user()
     session['logged_in'] = True
     session['username'] = user.username
-    session['userid'] = user.id     
+    session['userid'] = user.id
     return redirect(url_for('showcatalogs'))
+
 
 @app.route('/loginGoogle')
 def loginGoogle():
@@ -84,19 +87,17 @@ def authorized():
         )
     session['google_token'] = (resp['access_token'], '')
     me = google.get('userinfo')
-    data = me.data 
+    data = me.data
     email = data['email']
     session['logged_in'] = True
     session['username'] = email
     if helpers.is_registered(email) == 0:
         password = helpers.hash_password(email)
-        helpers.add_user(email, password, email)            
+        helpers.add_user(email, password, email)
     user = helpers.get_user_by_email(email)
-    id = user.id 
-    session['userid'] = id 
-    return redirect(url_for('showcatalogs'))    
-
-
+    id = user.id
+    session['userid'] = id
+    return redirect(url_for('showcatalogs'))
 
 
 @google.tokengetter
@@ -107,7 +108,7 @@ def get_google_oauth_token():
 @app.route('/showcatalogs', methods=['GET', 'POST'])
 @login_required
 def showcatalogs():
-    #if the request is not ajax
+    # if the request is not ajax
     # then render page
     if not request.is_xhr:
         catalog = helpers.query_catalog()
@@ -167,7 +168,7 @@ def additem():
         item_text = request.form['item_text'].lower()
         description_text = request.form['description_text'].lower()
         id = request.form['categoryId']
-        user_id = session['userid']        
+        user_id = session['userid']
         helpers.add_item(item_text, description_text, id, user_id)
         return redirect(url_for('showcatalogs'))
 
@@ -175,38 +176,38 @@ def additem():
 @app.route('/showitem/<item_id>', methods=['GET', 'POST'])
 @login_required
 def showedititem(item_id):
-    if request.method == 'GET':        
-        item = helpers.query_item(item_id)        
-        return render_template('showitem.html', item=item[0])        
-    elif request.method == 'POST' and 'action' in request.form and request.form['action'] == 'save':  # noqa        
+    if request.method == 'GET':
+        item = helpers.query_item(item_id)
+        return render_template('showitem.html', item=item[0])
+    elif request.method == 'POST' and 'action' in request.form and request.form['action'] == 'save':  # noqa
         # save action
         item_text_value = request.form['item_text']
         description_text = request.form['description_text']
-        user_id = session['userid']             
+        user_id = session['userid']
         item = helpers.query_item(item_id)[0]
-        if (item.user_id == user_id) :
-           helpers.update_item(item_id, item_text_value, description_text)
-           return redirect(url_for('showcatalogs'))
+        if (item.user_id == user_id):
+            helpers.update_item(item_id, item_text_value, description_text)
+            return redirect(url_for('showcatalogs'))
         else:
             # no permission to do update
-           return render_template('message.html', msg = "update")      
+            return render_template('message.html', msg="update")
     elif request.method == 'POST' and 'action' in request.form and request.form['action'] == 'delete':  # noqa
         # delete action
-        user_id = session['userid']             
-        item = helpers.query_item(item_id)[0]     
-        if (item.user_id == user_id) :
+        user_id = session['userid']
+        item = helpers.query_item(item_id)[0]
+        if (item.user_id == user_id):
             helpers.delete_item(item_id)
             return redirect(url_for('showcatalogs'))
         else:
-            return render_template('message.html' , msg = "delete")                  
+            return render_template('message.html', msg="delete")
     else:
         return redirect(url_for('showcatalogs'))
 
 
 @app.route("/logout")
 def logout():
-    session['logged_in'] = False    
-    session.pop('google_token', None)       
+    session['logged_in'] = False
+    session.pop('google_token', None)
     session.clear()
     return redirect(url_for('login'))
 
@@ -224,7 +225,7 @@ def signup():
                 if not helpers.username_taken(username):
                     helpers.add_user(username, password, email)
                     session['logged_in'] = True
-                    session['username'] = username                    
+                    session['username'] = username
                     return json.dumps({'status': 'Signup successful'})
                 return json.dumps({'status': 'Username taken'})
             return json.dumps({'status': 'User/Pass required'})
@@ -251,5 +252,5 @@ def settings():
 # ======== Main ============ #
 if __name__ == "__main__":
     app.secret_key = os.urandom(12)  # Generic key for dev purposes only
-    #app.run(debug=True, use_reloader=True)
-    app.run(host='localhost', port=8000,debug=True, use_reloader=True)
+    # app.run(debug=True, use_reloader=True)
+    app.run(host='localhost', port=8000, debug=True, use_reloader=True)
