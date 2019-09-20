@@ -83,10 +83,12 @@ $(document).ready(function() {
     });
   });
 
-  $(".dropdown-menu li a").click(function(){
+  var selected = -1 
+  $(".dropdown-menu li a").click(function(){    
     $(".btn:first-child").text($(this).text());
     $(".btn:first-child").val($(this).text());
     var id = $(this).attr("data-value");
+    selected = id ;
     $(".categoryindex").attr("value",id)
   });
 
@@ -106,6 +108,23 @@ $("#formfield").submit( function(eventObj) {
       .appendTo("#formfield");
   return true;
 });
+
+$('#warnng_message').hide()
+
+$('#additembutton').on("click",function(e) {
+    var name = $("#itemname").val()
+    var content = $("#descriptioncontent").val()    
+    if (name.length == 0 || content.length == 0 || selected == -1) {            
+      e.preventDefault();  
+      $('#warnng_message').show()    
+      setTimeout(function() { $("#warnng_message").hide(); }, 3000);
+    } else {
+       $("additemform").submit();
+    }
+}); 
+
+
+
 
 });
 
