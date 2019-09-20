@@ -17,3 +17,5 @@ Flask-Migrate
 Flask-SQLAlchemy
 Jinja2
 Flask-OAuthlib
+
+
