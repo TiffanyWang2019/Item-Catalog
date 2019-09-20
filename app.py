@@ -28,7 +28,7 @@ app.debug = True
 app.secret_key = 'development'
 oauth = OAuth(app)
 
-
+# google authorization
 google = oauth.remote_app(
     'google',
     consumer_key=app.config.get('GOOGLE_ID'),
