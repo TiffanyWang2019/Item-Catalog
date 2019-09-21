@@ -1,5 +1,3 @@
-activatethis = '/home/grader/Item-Catalog/venv/bin/activate_this.py'
-Use exec(open(activatethis).read(), {'__file__': activatethis}).
 import sys
 import logging
 import site
