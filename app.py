@@ -260,4 +260,4 @@ def settings():
 if __name__ == "__main__":
     app.secret_key = os.urandom(12)  # Generic key for dev purposes only
     # app.run(debug=True, use_reloader=True)
-    app.run(host='0.0.0.0', port=80, debug=True, use_reloader=True)
+    app.run(host='0.0.0.0', port=80, debug=False, use_reloader=True)
