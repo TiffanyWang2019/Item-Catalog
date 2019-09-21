@@ -8,7 +8,8 @@ from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.sql import func
 
 # Local
-SQLALCHEMY_DATABASE_URI = 'sqlite:///accounts.db'
+#SQLALCHEMY_DATABASE_URI = 'sqlite:///accounts.db'
+SQLALCHEMY_DATABASE_URI = 'postgres://catalog:udacity@localhost:5432/accounts'
 
 # Heroku
 # SQLALCHEMY_DATABASE_URI = os.environ['DATABASE_URL']
