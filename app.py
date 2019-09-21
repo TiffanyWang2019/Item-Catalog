@@ -260,4 +260,4 @@ def settings():
 if __name__ == "__main__":
     app.secret_key = os.urandom(12)  # Generic key for dev purposes only
     # app.run(debug=True, use_reloader=True)
-    app.run(host='ec2-3-14-14-218.us-east-2.compute.amazonaws.com', port=80, debug=True, use_reloader=True)
+    app.run(host='3.14.14.218', port=80, debug=True, use_reloader=True)
