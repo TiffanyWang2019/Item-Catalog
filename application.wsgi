@@ -1,7 +1,7 @@
 import sys
 import logging
 import site
-activatethis = '/home/grader/Item-Catalog/venv/bin/activatethis.py'
+activatethis = '/home/grader/Item-Catalog/venv/bin/activate_this.py'
 exec(compile(open(activatethis, "rb").read(), fileactivatethisname, 'exec'), globals, locals)
 logging.basicConfig(stream=sys.stderr)
 sys.path.insert(0,"/home/grader/Item-Catalog/scripts")
